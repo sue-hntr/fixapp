@@ -45,7 +45,7 @@ class SignUpForm extends Component {
       password: this.state.password
     })
   .then(res =>
-      this.setState({ user: res.data}))
+      this.setState({ redirect: true }))
   .catch(err => console.log(err));
     }
   }
@@ -74,7 +74,10 @@ class SignUpForm extends Component {
     // if (isInvalid){
     //   this.setState({ message: "All fields must be filled"})
     // }
-
+    const { redirect } = this.state;
+    if (redirect){
+      return <Redirect to='/profile' />
+    }
     return (
       <form onSubmit={this.onSubmit}>
       <input
