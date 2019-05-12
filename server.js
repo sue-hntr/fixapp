@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const bodyParser = require('body-parser');
+const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,8 +30,26 @@ const db = mongoose.connection;
 // mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
 
+//use sessions for tracking logins
+//store: save sessions to mongo, not RAM
+//needs to be after mongoose.connect because db not yet
+app.use(session({
+  secret: 'beware of little expenses',
+  resave: true,
+  saveUninitialized: false
+  // store: new MongoStore({
+  //   mongooseConnection: db
+  // })
+}));
+
 // Use morgan logger for logging requests
 app.use(logger("dev"));
+
+//see the session in console
+app.use( (req, res, next) => {
+  console.log('req.session', req.session);
+  return next();
+});
 
 // parse incoming requests: if problem look at app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
