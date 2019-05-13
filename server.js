@@ -7,6 +7,7 @@ const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const passport = require('passport')
 var logger = require("morgan");
 
 // Define middleware here
@@ -30,7 +31,11 @@ const db = mongoose.connection;
 // mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
 
-//use sessions for tracking logins
+// Use morgan logger for logging requests
+app.use(logger("dev"));
+
+////////// SESSIONS BEGIN //////////////
+//use express-sessions for tracking s
 //store: save sessions to mongo, not RAM
 //needs to be after mongoose.connect because db not yet
 app.use(session({
@@ -42,14 +47,23 @@ app.use(session({
   // })
 }));
 
-// Use morgan logger for logging requests
-app.use(logger("dev"));
-
-//see the session in console
+//see the express session in console from MERN
 app.use( (req, res, next) => {
   console.log('req.session', req.session);
   return next();
 });
+
+// Passport
+app.use(passport.initialize())
+app.use(passport.session()) 
+// above calls serializeUser and deserializeUser
+// serializeUser stores the user id to req.session.passport.user = {id:’..’}
+//deserializeUser will check to see if this user is saved in the database and
+//assigns it to req as req.user = {user object}.
+
+
+
+
 
 // parse incoming requests: if problem look at app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
